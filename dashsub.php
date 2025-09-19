@@ -1,0 +1,32 @@
+<?php  
+include 'session.php';
+//include_once('database.php');
+include 'dconn.php';
+$tqu=$_SESSION['questno'];
+//$sql=mysql_query("select * from testattempt where stdid=". $_SESSION['stdid']." and testid=".$_SESSION['testid']."");
+//$numrows=mysql_num_rows($sql);
+//$row=mysql_fetch_assoc($sql);
+$sl13 = "SELECT * FROM cf_testattempt WHERE stdid LIKE ? AND testid LIKE ? AND ans=correctans";
+$zq13 = $pdo->prepare($sl13);
+$zq13->execute(array($_SESSION['stdid'] , $_SESSION['testid']));
+$numrows2 = $zq13->rowCount();
+$score=$numrows2/$tqu*100;
+echo $score.'%';
+$tqu=$_SESSION['questno'];
+$username=$_SESSION['username'];
+$passmark=$_SESSION['passmark'];
+$display=$_SESSION['userresult'];
+$repeatable=$_SESSION['repeatable'];
+$tid=$_SESSION['testid'];
+$siql2 = "INSERT INTO cf_results(userid , test_id , score , tqu , mark , passmark , display , repeatable , testdate) VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+$ssqsw = $pdo->prepare($siql2);
+$ssqsw->execute(array($username , $tid , $numrows2 , $tqu , $score , $passmark , $display , $repeatable));
+unset($_SESSION['testid']);
+unset($_SESSION['test']);
+unset($_SESSION['questno']);
+unset($_SESSION['passmark']);
+unset($_SESSION['userresult']);
+unset($_SESSION['repeatable']);
+$_SESSION['success'] = "<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>Your test has been submitted, you may logout now or <a href='results.php'>click here to view your results</a></div>";
+header("location: dashboard.php");
+ ?>
